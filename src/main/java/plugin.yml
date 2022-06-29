@@ -1,0 +1,11 @@
+name: saveminecraft
+version: 1.0
+authors: [Blendydev]
+main: me.blendy.saveminecraft.Main
+commands:
+  changeorg:
+    description: Shows change.org signatures
+    usage: /changeorg
+  savemc:
+    description: Main command
+    usage: /savemc <subcommand>

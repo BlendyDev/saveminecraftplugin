@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Class-Path: jsoup-1.15.1.jar server.jar json-20140107.jar
+
