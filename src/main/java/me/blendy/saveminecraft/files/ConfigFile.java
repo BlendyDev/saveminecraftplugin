@@ -30,14 +30,16 @@ public class ConfigFile {
     }
     public static void setDefaults() {
         config.set("cooldown", 30);
+        config.set("versionCheckTime", 7200);
     }
     public static FileConfiguration getConfig() {
         return config;
     }
 
-    public static void setConfig (int cooldown) throws IOException {
+    public static void setConfig (int cooldown, int versionCheckTime) throws IOException {
         createConfig();
         config.set("cooldown", cooldown);
+        config.set("versionCheckTime", versionCheckTime);
         config.save(configFile);
     }
 
@@ -45,6 +47,7 @@ public class ConfigFile {
         createConfig();
         try {
             Main.changeOrgCooldown = (int) config.get("cooldown");
+            Main.versionCheckTime = (int) config.get("versionCheckTime");
         } catch (NullPointerException ex) {}
     }
 

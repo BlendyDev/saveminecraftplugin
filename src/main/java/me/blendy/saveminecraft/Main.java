@@ -7,6 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,8 +17,19 @@ import java.io.IOException;
 
 
 public class Main extends JavaPlugin {
+    private long changeOrgLastTimestamp = -1;
+    public static int changeOrgCooldown = 30;
+    public static int versionCheckTime = 7200;
+    public static Main plugin;
+    public static Main getInstance() {
+        return plugin;
+    }
+    VersionCheckLoop versionCheckLoop;
+    BukkitTask versionCheckTask;
+
     @Override
     public void onEnable() {
+
         plugin = this;
         new BukkitRunnable() {
             @Override
@@ -27,6 +39,8 @@ public class Main extends JavaPlugin {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                versionCheckLoop = new VersionCheckLoop();
+                versionCheckTask = versionCheckLoop.runTaskTimer(plugin, 0, versionCheckTime*20);
             }
         }.runTaskLater(this, 1);
     }
@@ -41,14 +55,9 @@ public class Main extends JavaPlugin {
         ConfigFile.loadConfig();
     }
     public void disableConfigs() throws IOException {
-        ConfigFile.setConfig(changeOrgCooldown);
+        ConfigFile.setConfig(changeOrgCooldown, versionCheckTime);
     }
-    private long changeOrgLastTimestamp = -1;
-    public static int changeOrgCooldown = 30;
-    public static Main plugin;
-    public static Main getInstance() {
-        return plugin;
-    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         switch (command.getName().toLowerCase()) {
@@ -75,6 +84,7 @@ public class Main extends JavaPlugin {
                     try {
                         enableConfigs();
                         changeOrgLastTimestamp = -1;
+                        VersionCheckLoop.reRun(plugin, versionCheckTime* 20L);
                         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aConfig reloaded!"));
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -88,9 +98,10 @@ public class Main extends JavaPlugin {
         return true;
     }
 
+
+
     int getSignatures (String url) throws IOException {
-        Document doc = Jsoup.connect(url).
-                ignoreContentType(true).parser(Parser.xmlParser()).get();
+        Document doc = Jsoup.connect(url).ignoreContentType(true).parser(Parser.xmlParser()).get();
         String text = doc.select("script").first().text().substring(20);
         JSONObject object = new JSONObject(text);
         return (int) (((JSONObject) ((JSONObject) object.get("petition")).get("signatureCount")).get("total"));
