@@ -62,22 +62,23 @@ public class Main extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         switch (command.getName().toLowerCase()) {
             case "changeorg" -> {
-                long currentTimeMillis = System.currentTimeMillis();
-                if (changeOrgLastTimestamp == -1 || currentTimeMillis - changeOrgLastTimestamp > changeOrgCooldown*1000) {
-                    String url = "https://www.change.org/p/minecraft-s-1-19-s-new-chat-moderation-is-dangerous-broken-saveminecraft";
-                    changeOrgLastTimestamp = currentTimeMillis;
-                    try {
-                        int signatures = getSignatures(url);
-                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "A total of &l" + signatures + "&r people have signed!\nGo sign at &b&n" + url + "&r!"));
+                Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+                    long currentTimeMillis = System.currentTimeMillis();
+                    if (changeOrgLastTimestamp == -1 || currentTimeMillis - changeOrgLastTimestamp > changeOrgCooldown*1000) {
+                        String url = "https://www.change.org/p/minecraft-s-1-19-s-new-chat-moderation-is-dangerous-broken-saveminecraft";
+                        changeOrgLastTimestamp = currentTimeMillis;
+                        try {
+                            int signatures = getSignatures(url);
+                            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "A total of &l" + signatures + "&r people have signed!\nGo sign at &b&n" + url + "&r!"));
 
-                    } catch (IOException e) {
-                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cIOException"));
-                        e.printStackTrace();
+                        } catch (IOException e) {
+                            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cIOException"));
+                            e.printStackTrace();
+                        }
+                    } else {
+                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cThis command is on cooldown! Try again in &b" + (int) (changeOrgCooldown - Math.floor((currentTimeMillis-changeOrgLastTimestamp)/1000)) + "&c seconds!"));
                     }
-                } else {
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cThis command is on cooldown! Try again in &b" + (int) (changeOrgCooldown - Math.floor((currentTimeMillis-changeOrgLastTimestamp)/1000)) + "&c seconds!"));
-                }
-
+                });
             }
             case "savemc" -> {
                 if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
