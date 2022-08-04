@@ -40,7 +40,7 @@ public class Main extends JavaPlugin {
                     e.printStackTrace();
                 }
                 versionCheckLoop = new VersionCheckLoop();
-                versionCheckTask = versionCheckLoop.runTaskTimer(plugin, 0, versionCheckTime*20);
+                versionCheckTask = versionCheckLoop.runTaskTimerAsynchronously(plugin, 0, versionCheckTime*20);
             }
         }.runTaskLater(this, 1);
     }
